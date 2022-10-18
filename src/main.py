@@ -89,7 +89,44 @@ class MainWindow(QMainWindow):
         self.tab_view.removeTab(index)
 
     def get_Editor(self) -> QsciScintilla:
-        pass
+        # Initialize the editor
+        editor = QsciScintilla()
+        # Encoding the editor
+        editor.setUtf8(True)
+        # Set the font
+        editor.setFont(self.window_font)
+
+        # Brace matching
+        editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+
+        # Indentation
+        editor.setIndentationGuides(True)
+        editor.setTabWidth(4)
+        editor.setIndentaionsUseTabs(False)
+        editor.setAutoIndent(True)
+
+        # Autocomplete
+        # TODO :: Add this later
+
+        # Caret
+        # TODO :: Add this later    
+
+        # EDL
+        editor.setEolMode(QsciScintilla.EOLWindows)
+        editor.setEolVisible(False)
+
+        
+
+
+
+
+
+
+
+
+
+
+
 
     def get_frame(self) -> QFrame:
         frame = QFrame()
@@ -145,6 +182,13 @@ class MainWindow(QMainWindow):
         folder_label.setFont(self.window_font)
         folder_label.mousePressEvent = self.show_hidden_tab
         side_bar_layout.addWidget(folder_label)
+
+        search_label = QLabel()
+        search_label.setPixmap(QPixmap("src\icons\icons8-search-50.png").scaled(QSize(30, 30)))
+        search_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        search_label.setFont(self.window_font)
+        search_label.mousePressEvent = self.show_hidden_tab
+        side_bar_layout.addWidget(search_label)
 
         self.side_bar.setLayout(side_bar_layout)
 
