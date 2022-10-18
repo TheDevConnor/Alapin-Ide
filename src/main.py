@@ -138,13 +138,6 @@ class MainWindow(QMainWindow):
         side_bar_layout.setSpacing(0)
         side_bar_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
 
-        # setup labels
-        # folder_label = self.get_side_bar_label("./src/icons/folder-icon-blue.svg`", "folder-icon")
-        # side_bar_layout.addWidget(folder_label)
-
-        # search_label = self.get_side_bar_label("./src/icons/search-icon", "search-icon")
-        # side_bar_layout.addWidget(search_label)
-
         self.side_bar.setLayout(side_bar_layout)
 
 
