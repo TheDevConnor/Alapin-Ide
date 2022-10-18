@@ -85,74 +85,93 @@ class MainWindow(QMainWindow):
     def copy(self):
         ...
 
+    def close_tab(self, index):
+        self.tab_view.removeTab(index)
+
     def get_Editor(self) -> QsciScintilla:
         pass
 
+    def get_frame(self) -> QFrame:
+        frame = QFrame()
+        frame.setFrameShape(QFrame.NoFrame)
+        frame.setFrameShadow(QFrame.Plain)
+        frame.setContentsMargins(0, 0, 0, 0)
+        frame.setStyleSheet('''
+            QFrame {
+                background-color: #21252b;
+                border-radius: 5px;
+                border: none;
+                padding: 5px;
+                color: #D3D3D3;
+            }
+            QFrame:hover {
+                color: white;
+            }
+        ''')
+        return frame
+
+
     def set_up_body(self):
-        
-        # The Body
+       # Body        
         body_frame = QFrame()
         body_frame.setFrameShape(QFrame.NoFrame)
-        body_frame.setFrameShadow(QFrame.Plain) 
+        body_frame.setFrameShadow(QFrame.Plain)
         body_frame.setLineWidth(0)
         body_frame.setMidLineWidth(0)
         body_frame.setContentsMargins(0, 0, 0, 0)
         body_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        body = QVBoxLayout()
+        body = QHBoxLayout()
         body.setContentsMargins(0, 0, 0, 0)
         body.setSpacing(0)
         body_frame.setLayout(body)
 
-        # The Side Bar
+        ##############################
+        ###### SIDE BAR ##########
         self.side_bar = QFrame()
         self.side_bar.setFrameShape(QFrame.StyledPanel)
         self.side_bar.setFrameShadow(QFrame.Plain)
         self.side_bar.setStyleSheet(f'''
             background-color: {self.side_bar_color};
-        ''')
-        side_bar_layout = QHBoxLayout()
+        ''')   
+        side_bar_layout = QVBoxLayout()
         side_bar_layout.setContentsMargins(5, 10, 5, 0)
         side_bar_layout.setSpacing(0)
         side_bar_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+
+        # setup labels
+        # folder_label = self.get_side_bar_label("./src/icons/folder-icon-blue.svg`", "folder-icon")
+        # side_bar_layout.addWidget(folder_label)
+
+        # search_label = self.get_side_bar_label("./src/icons/search-icon", "search-icon")
+        # side_bar_layout.addWidget(search_label)
+
         self.side_bar.setLayout(side_bar_layout)
 
-        body.addWidget(self.side_bar)
 
-        # Split View
+        # split view
         self.hsplit = QSplitter(Qt.Horizontal)
 
-        # frame and layout to hold the tree view
-        self.tree_frame = QFrame()
-        self.tree_frame.setLineWidth(1)
-        self.tree_frame.setMaximumWidth(600)
-        self.tree_frame.setMinimumWidth(200)
-        self.tree_frame.setBaseSize(100, 0)
-        self.tree_frame.setContentsMargins(0, 0, 0, 0)
+        ##############################
+        ###### FILE MANAGER ##########
+
+        # frame and layout to hold tree view (file manager)
+        self.file_manager_frame = self.get_frame()
+        self.file_manager_frame.setMaximumWidth(400)
+        self.file_manager_frame.setMinimumWidth(200)
         tree_frame_layout = QVBoxLayout()
         tree_frame_layout.setContentsMargins(0, 0, 0, 0)
         tree_frame_layout.setSpacing(0)
-        self.tree_frame.setStyleSheet('''
-            QFrame {
-                background-color: #282c34;
-                border-radius: 5px;
-                border: none;
-                padding: 5px;
-                color: #D4D4D4;
-            }
-            QFrame:hover {
-                color: #D4D4B4; 
-            }
-        ''')
 
-        # Create the tree view for the files
+        # Create file system model to show in tree view
         self.model = QFileSystemModel()
         self.model.setRootPath(os.getcwd())
-        # Filter out the files we don't want to see
+        # File system filters
         self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs | QDir.Files)
 
-        # tree view
+        ##############################
+        ###### FILE VIEWER ##########
         self.tree_view = QTreeView()
-        self.tree_view.setFont(QFont("Consolas", 13))
+        self.tree_view.setFont(QFont("FiraCode", 13))
         self.tree_view.setModel(self.model)
         self.tree_view.setRootIndex(self.model.index(os.getcwd()))
         self.tree_view.setSelectionMode(QTreeView.SingleSelection)
@@ -161,19 +180,29 @@ class MainWindow(QMainWindow):
         # add custom context menu
         self.tree_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree_view.customContextMenuRequested.connect(self.tree_view_context_menu)
-        # Handling click
+        # handling click
         self.tree_view.clicked.connect(self.tree_view_clicked)
         self.tree_view.setIndentation(10)
         self.tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # Hide header and hide other columns except for name
+        self.tree_view.setHeaderHidden(True) # hiding header
+        self.tree_view.setColumnHidden(1, True)
+        self.tree_view.setColumnHidden(2, True)
+        self.tree_view.setColumnHidden(3, True)
 
         # setup layout
         tree_frame_layout.addWidget(self.tree_view)
-        self.tree_frame.setLayout(tree_frame_layout)
+        self.file_manager_frame.setLayout(tree_frame_layout)
 
-        # Add the tree view to the split view
-        self.hsplit.addWidget(self.tree_frame)
+        ##############################
+        ###### SETUP WIDGETS ##########
 
+        # add tree view and tab view
+        self.hsplit.addWidget(self.file_manager_frame)
+
+        body.addWidget(self.side_bar)
         body.addWidget(self.hsplit)
+
         body_frame.setLayout(body)
 
         self.setCentralWidget(body_frame)
