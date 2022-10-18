@@ -1,5 +1,5 @@
 QMainWindow {
-    background-color: #282c34;
+    background-color: #68716f;
     color: #d3d3d3;
 }
 
@@ -165,14 +165,14 @@ QLineEditBox:hover {
 }
 
 QListView {
-    background-color: #21252b;
+    background-color: #5c6462;
     border-radius: 5px;
     border: 1px solid #D3D3D3;
     padding: 5px;
     color: #d3d3d3;
 }
 QListView::item:hover {
-    background-color: #323842;
+    background-color: #5c6462;
     border: 1px soid #d3d3d3;
     border-radius: 3px;
     color: #d3d3d3;
@@ -185,12 +185,13 @@ QListView::item:selected {
 }
 
 QMenuBar {
-    background-color: #282c34;
+    background-color: #5c6462;
     border: 1px soid #21252b;
-    font-size: large;
+    color: #D3D3D3;
+    font-size: 15px;
 }
 
 QMenuBar::item {
-    background-color: #282c34;
+    background-color: #5c6462;
     color: #d3d3d3;
 }

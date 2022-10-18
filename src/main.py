@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle("Alapin")
-        self.setWindowIcon(QIcon("icons\Alpine.png"))
+        self.setWindowIcon(QIcon(".\src\icons\Alpine.png"))
         self.resize(1050, 550)
 
         self.setStyleSheet(open(".\src\css\style.qss", "r").read())
@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
         frame.setContentsMargins(0, 0, 0, 0)
         frame.setStyleSheet('''
             QFrame {
-                background-color: #21252b;
+                background-color: #68716f;
                 border-radius: 5px;
                 border: none;
                 padding: 5px;
@@ -137,6 +137,14 @@ class MainWindow(QMainWindow):
         side_bar_layout.setContentsMargins(5, 10, 5, 0)
         side_bar_layout.setSpacing(0)
         side_bar_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+
+        # Set up the labels for the side bar buttons
+        folder_label = QLabel()
+        folder_label.setPixmap(QPixmap("src\icons\icons8-folder-64.png").scaled(QSize(40, 40)))
+        folder_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        folder_label.setFont(self.window_font)
+        folder_label.mousePressEvent = self.show_hidden_tab
+        side_bar_layout.addWidget(folder_label)
 
         self.side_bar.setLayout(side_bar_layout)
 
@@ -188,10 +196,22 @@ class MainWindow(QMainWindow):
         self.file_manager_frame.setLayout(tree_frame_layout)
 
         ##############################
+        ###### TAB WIDGETS ##########
+
+        self.tab_view = QTabWidget()
+        self.tab_view.setContentsMargins(5, 10, 5, 0)
+        self.tab_view.setTabsClosable(True)
+        self.tab_view.setMovable(True)
+        self.tab_view.setDocumentMode(True)
+        # self.tab_view.tabCloseRequested.connect(self.close_tab)
+
+
+        ##############################
         ###### SETUP WIDGETS ##########
 
         # add tree view and tab view
         self.hsplit.addWidget(self.file_manager_frame)
+        self.hsplit.addWidget(self.tab_view)
 
         body.addWidget(self.side_bar)
         body.addWidget(self.hsplit)
@@ -199,6 +219,9 @@ class MainWindow(QMainWindow):
         body_frame.setLayout(body)
 
         self.setCentralWidget(body_frame)
+
+    def show_hidden_tab(self, event):
+        ...
 
     def tree_view_context_menu(self, pos):
         ...
