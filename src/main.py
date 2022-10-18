@@ -115,19 +115,6 @@ class MainWindow(QMainWindow):
         editor.setEolMode(QsciScintilla.EOLWindows)
         editor.setEolVisible(False)
 
-        
-
-
-
-
-
-
-
-
-
-
-
-
     def get_frame(self) -> QFrame:
         frame = QFrame()
         frame.setFrameShape(QFrame.NoFrame)

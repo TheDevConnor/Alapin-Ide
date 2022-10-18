@@ -1,4 +1,4 @@
-QMainWindow {
+/* QMainWindow {
     background-color: #68716f;
     color: #d3d3d3;
 }
@@ -194,4 +194,4 @@ QMenuBar {
 QMenuBar::item {
     background-color: #5c6462;
     color: #d3d3d3;
-}
+} */
