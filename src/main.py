@@ -176,10 +176,9 @@ class MainWindow(QMainWindow):
 
         if not is_new_file:
             editor.setText(path.read_text())
-        self.setWindowTitle(path.name)
         self.current_file = path
         self.tab_view.setCurrentIndex(self.tab_view.count() - 1)
-        self.statusBar().showMessage("Opened file: {}".format(path.name), 2000)
+        self.statusBar().showMessage("Opened file: {}".format(path.name))
 
     def get_frame(self) -> QFrame:
         frame = QFrame()
@@ -195,7 +194,7 @@ class MainWindow(QMainWindow):
                 color: #2e3440;
             }
             QFrame:hover {
-                color: white;
+                color: blue;
             }
         ''')
         return frame
