@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
         frame.setStyleSheet('''
             QFrame {
                 background-color: #d8dee1;
-                border-radius: 5px;
+                border-radius: 1px;
                 border: none;
                 padding: 5px;
                 color: black;
