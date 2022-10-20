@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(QMainWindow, self).__init__()
-        self.side_bar_color = "#68717f"
+        self.side_bar_color = "#d8dee9"
         self.init_ui()
 
         self.current_file = None
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         # Indentation
         editor.setIndentationGuides(True)
         editor.setTabWidth(4)
-        editor.setIndentaionsUseTabs(False)
+        editor.setIndentationsUseTabs(False)
         editor.setAutoIndent(True)
 
         # Autocomplete
@@ -112,8 +112,74 @@ class MainWindow(QMainWindow):
         # TODO :: Add this later    
 
         # EDL
-        editor.setEolMode(QsciScintilla.EOLWindows)
-        editor.setEolVisible(False)
+        editor.setEolMode(QsciScintilla.EolUnix)
+        editor.setEolVisibility(False)
+        
+        # Lexer and Syntax Highlighting
+        editor.setLexer(QsciLexerPython())
+        editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
+
+        # Line Number
+        editor.setMarginLineNumbers(0, True)
+        editor.setMarginWidth(0, "0000")
+
+        # Current Line
+        editor.setCaretLineVisible(True)
+        editor.setCaretLineBackgroundColor(QColor("#d8dee9"))
+
+        # Selection
+        editor.setSelectionBackgroundColor(QColor("#4c566a"))
+        editor.setSelectionForegroundColor(QColor("#d8dee9"))
+
+        # White Space
+        editor.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        editor.setWhitespaceForegroundColor(QColor("#4c566a"))
+
+        # Indentation Guide
+        editor.setIndentationGuides(True)
+        editor.setIndentationGuidesForegroundColor(QColor("#4c566a"))
+
+        # Wrap Mode
+        editor.setWrapMode(QsciScintilla.WrapWord)
+
+        # Zoom
+        editor.zoomTo(0)
+
+        # Set the default text
+        editor.setText("")
+        return editor
+
+    def is_binary(self, path: Path):
+        '''Check if the file is binary or not'''
+        with open(path, 'rb') as f:
+            return b'\0' in f.read(1024)
+
+    def set_new_tab(self, path: Path, is_new_file=False):
+        if not path.is_file():
+            return
+        if not is_new_file and self.is_binary(path):
+            self.statusBar().showMessage("Cannot open binary file", 2000)
+            return
+
+        # Check if the file is open
+        if not is_new_file:
+            for i in range(self.tab_view.count()):
+                if self.tab_view.tabText(i) == path.name:
+                    self.tab_view.setCurrentIndex(i)
+                    self.current_file = path
+                    return
+
+        # Create a new tab
+        editor = self.get_Editor()
+
+        self.tab_view.addTab(editor, path.name)
+
+        if not is_new_file:
+            editor.setText(path.read_text())
+        self.setWindowTitle(path.name)
+        self.current_file = path
+        self.tab_view.setCurrentIndex(self.tab_view.count() - 1)
+        self.statusBar().showMessage("Opened file: {}".format(path.name), 2000)
 
     def get_frame(self) -> QFrame:
         frame = QFrame()
@@ -122,11 +188,11 @@ class MainWindow(QMainWindow):
         frame.setContentsMargins(0, 0, 0, 0)
         frame.setStyleSheet('''
             QFrame {
-                background-color: #68716f;
+                background-color: #d8dee1;
                 border-radius: 5px;
                 border: none;
                 padding: 5px;
-                color: #D3D3D3;
+                color: black;
             }
             QFrame:hover {
                 color: white;
@@ -257,8 +323,10 @@ class MainWindow(QMainWindow):
     def tree_view_context_menu(self, pos):
         ...
 
-    def tree_view_clicked(self, index):
-        ...
+    def tree_view_clicked(self, index: QModelIndex):
+        path = self.model.filePath(index)
+        p = Path(path)
+        self.set_new_tab(p)
 
 if __name__ == "__main__":
     app = QApplication([])
