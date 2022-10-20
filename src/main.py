@@ -155,27 +155,31 @@ class MainWindow(QMainWindow):
             return b'\0' in f.read(1024)
 
     def set_new_tab(self, path: Path, is_new_file=False):
+        # Create a new tab
+        editor = self.get_Editor()
+
+        if is_new_file:
+            self.tab_view.addTab(editor, "Untitled")
+            self.setWindowTitle("Alapin - Untitled")
+            self.statusBar().showMessage("New File")
+            self.tab_view.setCurrentIndex(self.tab_view.count() - 1)
+            self.current_file = None
+            return
         if not path.is_file():
             return
-        if not is_new_file and self.is_binary(path):
+        if self.is_binary(path):
             self.statusBar().showMessage("Cannot open binary file", 2000)
             return
 
         # Check if the file is open
-        if not is_new_file:
-            for i in range(self.tab_view.count()):
-                if self.tab_view.tabText(i) == path.name:
-                    self.tab_view.setCurrentIndex(i)
-                    self.current_file = path
-                    return
-
-        # Create a new tab
-        editor = self.get_Editor()
+        for i in range(self.tab_view.count()):
+            if self.tab_view.tabText(i) == path.name:
+                self.tab_view.setCurrentIndex(i)
+                self.current_file = path
+                return
 
         self.tab_view.addTab(editor, path.name)
-
-        if not is_new_file:
-            editor.setText(path.read_text())
+        editor.setText(path.read_text())
         self.current_file = path
         self.tab_view.setCurrentIndex(self.tab_view.count() - 1)
         self.statusBar().showMessage("Opened file: {}".format(path.name))
