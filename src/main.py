@@ -128,7 +128,7 @@ class MainWindow(QMainWindow):
         editor.setCaretLineBackgroundColor(QColor("#d8dee9"))
 
         # Selection
-        editor.setSelectionBackgroundColor(QColor("#4c566a"))
+        editor.setSelectionBackgroundColor(QColor("#4d12a2"))
         editor.setSelectionForegroundColor(QColor("#d8dee9"))
 
         # White Space
@@ -137,7 +137,7 @@ class MainWindow(QMainWindow):
 
         # Indentation Guide
         editor.setIndentationGuides(True)
-        editor.setIndentationGuidesForegroundColor(QColor("#4c566a"))
+        editor.setIndentationGuidesForegroundColor(QColor("#4F56Ba"))
 
         # Wrap Mode
         editor.setWrapMode(QsciScintilla.WrapWord)
