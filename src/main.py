@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
                 border-radius: 1px;
                 border: none;
                 padding: 5px;
-                color: black;
+                color: #2e3440;
             }
             QFrame:hover {
                 color: white;
