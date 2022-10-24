@@ -2,6 +2,9 @@ from pathlib import Path # Python 3.4+ only
 import sys
 import os
 
+import keyword
+import pkgutil
+
 from PyQt5.Qsci  import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -20,13 +23,13 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle("Alapin")
-        self.setWindowIcon(QIcon("src\icons\Alpine.png"))
+        self.setWindowIcon(QIcon("src/icons/Alpine.png"))
         self.resize(1050, 550)
 
-        self.setStyleSheet(open("src\css\style.qss", "r").read())
+        self.setStyleSheet(open("src/css/style.qss", "r").read())
 
-        self.window_font = QFont("Consolas")
-        self.window_font.setPointSize(10)
+        self.window_font = QFont("JetBrains Mono")
+        self.window_font.setPointSize(12)
         self.setFont(self.window_font)
 
         self.set_up_menu()
@@ -76,6 +79,35 @@ class MainWindow(QMainWindow):
         copy_action.setShortcut("Ctrl+C")
         copy_action.triggered.connect(self.copy)
 
+        cut_action = edit_menu.addAction("Cut")
+        cut_action.setShortcut("Ctrl+X")
+        cut_action.triggered.connect(self.cut)
+
+        paste_action = edit_menu.addAction("Paste")
+        paste_action.setShortcut("Ctrl+V")
+        paste_action.triggered.connect(self.paste)
+
+        undo_action = edit_menu.addAction("Undo")
+        undo_action.setShortcut("Ctrl+Z")
+        undo_action.triggered.connect(self.undo)
+
+        redo_action = edit_menu.addAction("Redo")
+        redo_action.setShortcut("Ctrl+Shift+Z")
+        redo_action.triggered.connect(self.redo)
+
+        edit_menu.addSeparator()
+
+        select_all_action = edit_menu.addAction("Select All")
+        select_all_action.setShortcut("Ctrl+A")
+        select_all_action.triggered.connect(self.select_all)
+
+        # View Menu
+        view_menu = menu_bar.addMenu("View")
+
+        run_action = view_menu.addAction("Run")
+        run_action.setShortcut("Ctrl+R")
+        run_action.triggered.connect(self.run)
+
         # Help menu
         help_menu = menu_bar.addMenu("Help")
 
@@ -103,18 +135,115 @@ class MainWindow(QMainWindow):
         editor.setAutoIndent(True)
 
         # Autocomplete
-        # TODO :: Add this later
+        editor.setAutoCompletionSource(QsciScintilla.AcsAll)
+        editor.setAutoCompletionThreshold(1)
+        editor.setAutoCompletionCaseSensitivity(False)
+        editor.setAutoCompletionUseSingle(QsciScintilla.AcusNever)
 
-        # Caret
-        # TODO :: Add this later    
+        # Caret5
+        editor.setCaretForegroundColor(QColor("#2e3440"))
+        editor.setCaretLineVisible(True)
+        editor.setCaretLineBackgroundColor(QColor("#d8dee1"))
+        editor.setCaretWidth(4)
+        editor.setCaretLineBackgroundColor(QColor("#d8dee1"))
 
         # EDL
         editor.setEolMode(QsciScintilla.EolUnix)
         editor.setEolVisibility(False)
         
-        # Lexer and Syntax Highlighting
-        editor.setLexer(QsciLexerPython())
-        editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
+        # Lexer for syntax highlighting
+        self.pyLexer = QsciLexerPython()
+        self.htmlLexer = QsciLexerHTML()
+        self.csharpLexer = QsciLexerCSharp()
+        self.cppLexer = QsciLexerCPP()
+        self.javaLexer = QsciLexerJava()
+        self.jsLexer = QsciLexerJavaScript()
+        self.luaLexer = QsciLexerLua()
+        self.rubyLexer = QsciLexerRuby()
+        self.xmlLexer = QsciLexerXML()
+        self.yamlLexer = QsciLexerYAML()
+        self.cmakeLexer = QsciLexerCMake()
+        self.cssLexer = QsciLexerCSS()
+        self.diffLexer = QsciLexerDiff()
+        self.makefileLexer = QsciLexerMakefile()
+        self.perlLexer = QsciLexerPerl()
+        self.powershellLexer = QsciLexerPOV()
+        self.povLexer = QsciLexerPOV()
+        self.propertiesLexer = QsciLexerProperties()
+        self.psLexer = QsciLexerPostScript()
+        self.coffiescriptLexer = QsciLexerCoffeeScript()
+
+        self.pyLexer.setDefaultFont(self.window_font)
+        self.htmlLexer.setDefaultFont(self.window_font)
+        self.csharpLexer.setDefaultFont(self.window_font)
+        self.cppLexer.setDefaultFont(self.window_font)
+        self.javaLexer.setDefaultFont(self.window_font)
+        self.jsLexer.setDefaultFont(self.window_font)
+        self.luaLexer.setDefaultFont(self.window_font)
+        self.rubyLexer.setDefaultFont(self.window_font)
+        self.xmlLexer.setDefaultFont(self.window_font)
+        self.yamlLexer.setDefaultFont(self.window_font)
+        self.cmakeLexer.setDefaultFont(self.window_font)
+        self.cssLexer.setDefaultFont(self.window_font)
+        self.diffLexer.setDefaultFont(self.window_font)
+        self.makefileLexer.setDefaultFont(self.window_font)
+        self.perlLexer.setDefaultFont(self.window_font)
+        self.powershellLexer.setDefaultFont(self.window_font)
+        self.povLexer.setDefaultFont(self.window_font)
+        self.propertiesLexer.setDefaultFont(self.window_font)
+        self.psLexer.setDefaultFont(self.window_font)
+        self.coffiescriptLexer.setDefaultFont(self.window_font)
+
+        # API
+        self.api = QsciAPIs(self.pyLexer)
+        self.api = QsciAPIs(self.htmlLexer)
+        self.api = QsciAPIs(self.csharpLexer)
+        self.api = QsciAPIs(self.cppLexer)
+        self.api = QsciAPIs(self.javaLexer)
+        self.api = QsciAPIs(self.jsLexer)
+        self.api = QsciAPIs(self.luaLexer)
+        self.api = QsciAPIs(self.rubyLexer)
+        self.api = QsciAPIs(self.xmlLexer)  
+        self.api = QsciAPIs(self.yamlLexer)
+        self.api = QsciAPIs(self.cmakeLexer)
+        self.api = QsciAPIs(self.cssLexer)
+        self.api = QsciAPIs(self.diffLexer)
+        self.api = QsciAPIs(self.makefileLexer)
+        self.api = QsciAPIs(self.perlLexer)
+        self.api = QsciAPIs(self.powershellLexer)
+        self.api = QsciAPIs(self.povLexer)
+        self.api = QsciAPIs(self.propertiesLexer)
+        self.api = QsciAPIs(self.psLexer)
+        self.api = QsciAPIs(self.coffiescriptLexer)
+        for key in keyword.kwlist + dir(__builtins__):
+            self.api.add(key)
+
+        for _, name, _ in pkgutil.iter_modules():
+            self.api.add(name)
+
+        self.api.prepare()
+
+        # Set the lexer
+        editor.setLexer(self.pyLexer)
+        editor.setLexer(self.htmlLexer)
+        editor.setLexer(self.csharpLexer)
+        editor.setLexer(self.cppLexer)
+        editor.setLexer(self.javaLexer)
+        editor.setLexer(self.jsLexer)
+        editor.setLexer(self.luaLexer)
+        editor.setLexer(self.rubyLexer)
+        editor.setLexer(self.xmlLexer)
+        editor.setLexer(self.yamlLexer)
+        editor.setLexer(self.cmakeLexer)
+        editor.setLexer(self.cssLexer)
+        editor.setLexer(self.diffLexer)
+        editor.setLexer(self.makefileLexer)
+        editor.setLexer(self.perlLexer)
+        editor.setLexer(self.powershellLexer)
+        editor.setLexer(self.povLexer)
+        editor.setLexer(self.propertiesLexer)
+        editor.setLexer(self.psLexer)
+        editor.setLexer(self.coffiescriptLexer)
 
         # Line Number
         editor.setMarginLineNumbers(0, True)
@@ -230,14 +359,14 @@ class MainWindow(QMainWindow):
 
         # Set up the labels for the side bar buttons
         folder_label = QLabel()
-        folder_label.setPixmap(QPixmap("src\icons\icons8-folder-64.png").scaled(QSize(40, 40)))
+        folder_label.setPixmap(QPixmap("src/icons/icons8-folder-64.png").scaled(QSize(40, 40)))
         folder_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         folder_label.setFont(self.window_font)
         folder_label.mousePressEvent = self.show_hidden_tab
         side_bar_layout.addWidget(folder_label)
 
         search_label = QLabel()
-        search_label.setPixmap(QPixmap("src\icons\icons8-search-50.png").scaled(QSize(30, 30)))
+        search_label.setPixmap(QPixmap("src/icons/icons8-search-50.png").scaled(QSize(30, 30)))
         search_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         search_label.setFont(self.window_font)
         search_label.mousePressEvent = self.show_hidden_tab
@@ -300,10 +429,10 @@ class MainWindow(QMainWindow):
         self.tab_view.setTabsClosable(True)
         self.tab_view.setMovable(True)
         self.tab_view.setDocumentMode(True)
-        # self.tab_view.tabCloseRequested.connect(self.close_tab)
+        self.tab_view.tabCloseRequested.connect(self.close_tab)
+        self.tab_view.tabBar().setExpanding(False)
 
-
-        ##############################
+        ###############################
         ###### SETUP WIDGETS ##########
 
         # add tree view and tab view
@@ -329,18 +458,24 @@ class MainWindow(QMainWindow):
         self.set_new_tab(p)
 
     def about(self):
-        ...
+        # This is the about Menu
+        QMessageBox.about(self, "About", "This is a simple text editor made by TheDevConnor on yt")
+
 
     def new_file(self):
         self.set_new_tab(None, is_new_file=True)
 
     def open_file(self):
         # Open a new file
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", os.getcwd(), 
-                                             "All Files (*);;Python Files (*.py)")
-        if file_name:
-            p = Path(file_name)
-            self.set_new_tab(p)
+        ops = QFileDialog.Options()
+        ops |= QFileDialog.DontUseNativeDialog
+        # I will add support for opening multiple files at the same time later on. Just going simple for now
+        new_file, _ = QFileDialog.getOpenFileName(self, "Open File", "", "All Files (*);;Python Files (*.py)", options=ops)
+        if new_file:
+            self.statusBar().showMessage(f"Opening Filed Cancelled")
+            return
+        p = Path(new_file)
+        self.set_new_tab(p)
 
     def open_folder(self):
         # Open a new folder
@@ -384,6 +519,49 @@ class MainWindow(QMainWindow):
 
         editor.copy()
 
+    def cut(self):
+        # This will cut the contents of the current tab
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            return
+
+        editor.cut()
+
+    def paste(self):
+        # This will paste the contents of the current tab
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            return
+
+        editor.paste()
+
+    def undo(self):
+        # This will undo the contents of the current tab
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            return
+
+        editor.undo()
+
+    def redo(self):
+        # This will redo the contents of the current tab
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            return
+
+        editor.redo()
+
+    def select_all(self):
+        # This will select all the contents of the current tab
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            return
+
+        editor.selectAll()
+
+    def run(self):
+        ...
+    
 if __name__ == "__main__":
     app = QApplication([])
     window = MainWindow()
