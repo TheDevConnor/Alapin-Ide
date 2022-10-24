@@ -1,6 +1,6 @@
+from pathlib import Path # Python 3.4+ only
 import sys
 import os
-from pathlib import Path # Python 3.4+ only
 
 from PyQt5.Qsci  import *
 from PyQt5.QtGui import *
@@ -18,10 +18,10 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle("Alapin")
-        self.setWindowIcon(QIcon(".\src\icons\Alpine.png"))
+        self.setWindowIcon(QIcon("src\icons\Alpine.png"))
         self.resize(1050, 550)
 
-        self.setStyleSheet(open(".\src\css\style.qss", "r").read())
+        self.setStyleSheet(open("src\css\style.qss", "r").read())
 
         self.window_font = QFont("Consolas")
         self.window_font.setPointSize(10)
@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         file_menu = menu_bar.addMenu("File")
         
         new_file = file_menu.addAction("New File")
-        new_file.setShortcut("Ctrl+N")
+        new_file.setShortcut("Ctrl+Shift+N")
         new_file.triggered.connect(self.new_file)
 
         open_file = file_menu.addAction("Open File")
@@ -50,6 +50,16 @@ class MainWindow(QMainWindow):
         open_folder = file_menu.addAction("Open Folder")
         open_folder.setShortcut("Ctrl+K")
         open_folder.triggered.connect(self.open_folder)
+
+        file_menu.addSeparator()
+
+        save_file = file_menu.addAction("Save")
+        save_file.setShortcut("Ctrl+S")
+        save_file.triggered.connect(self.save_file)
+
+        save_as = file_menu.addAction("Save As")
+        save_as.setShortcut("Ctrl+Shift+S")
+        save_as.triggered.connect(self.save_as)
 
         file_menu.addSeparator()
 
@@ -69,21 +79,6 @@ class MainWindow(QMainWindow):
 
         about = help_menu.addAction("About")
         about.triggered.connect(self.about)
-    
-    def about(self):
-        ...
-
-    def new_file(self):
-        ...
-
-    def open_file(self):
-        ...
-
-    def open_folder(self):
-        ...
-
-    def copy(self):
-        ...
 
     def close_tab(self, index):
         self.tab_view.removeTab(index)
@@ -330,6 +325,40 @@ class MainWindow(QMainWindow):
         path = self.model.filePath(index)
         p = Path(path)
         self.set_new_tab(p)
+
+    def about(self):
+        ...
+
+    def new_file(self):
+        self.set_new_tab(None, is_new_file=True)
+
+    def open_file(self):
+        ...
+
+    def open_folder(self):
+        ...
+
+    def save_file(self):
+        # Save the file
+        if self.current_file is None and self.tab_view.count() > 0:
+            self.save_as()
+
+        editor = self.tab_view.currentWidget()
+        self.current_file.write_text(editor.text())
+        self.statusBar().showMessage(f"Saved {self.current_file.name}", 2000)
+
+    def save_as(self):
+        # Save as
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "All Files (*)")
+            if file_name:
+                with open(file_name, "w") as f:
+                    f.write(editor.text())
+                self.statusBar().showMessage(f"Saved {file_name}", 2000)
+
+    def copy(self):
+        ...
 
 if __name__ == "__main__":
     app = QApplication([])
