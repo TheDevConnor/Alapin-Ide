@@ -3,5 +3,25 @@ This is a custom ide that I will be writing, because I want to use something tha
 
 
 Ths ide will support many different popular languages!
-for now I wil be supporint all the main and used languas
-such as pyhon, bash, c#, cmake, html, css, javascript, ..etc
+for now these are the supported languages
+such as:
+        Python()
+        HTML()
+        CSharp()
+        CPP()
+        Java()
+        JavaScript()
+        Lua()
+        Ruby()
+        XML()
+        YAML()
+        CMake()
+        CSS()
+        iff()
+        Makefile()
+        Perl()
+        POV()
+        POV()
+        Properties()
+        PostScript()
+        CoffeeScript()
