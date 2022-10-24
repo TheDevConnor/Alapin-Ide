@@ -12,6 +12,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(QMainWindow, self).__init__()
         self.side_bar_color = "#d8dee9"
+        self.window_color = "#000000"
+        self.text_color = "#fff"
         self.init_ui()
 
         self.current_file = None
@@ -333,10 +335,21 @@ class MainWindow(QMainWindow):
         self.set_new_tab(None, is_new_file=True)
 
     def open_file(self):
-        ...
+        # Open a new file
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", os.getcwd(), 
+                                             "All Files (*);;Python Files (*.py)")
+        if file_name:
+            p = Path(file_name)
+            self.set_new_tab(p)
 
     def open_folder(self):
-        ...
+        # Open a new folder
+        folder_name = QFileDialog.getExistingDirectory(self, "Open Folder", os.getcwd())
+        if folder_name:
+            p = Path(folder_name)
+            self.model.setRootPath(folder_name)
+            self.tree_view.setRootIndex(self.model.index(folder_name))
+            self.statusBar().showMessage(f"Opened folder {folder_name}")
 
     def save_file(self):
         # Save the file
@@ -351,14 +364,25 @@ class MainWindow(QMainWindow):
         # Save as
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "All Files (*)")
-            if file_name:
-                with open(file_name, "w") as f:
-                    f.write(editor.text())
-                self.statusBar().showMessage(f"Saved {file_name}", 2000)
+            return
+
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "All Files (*)")
+        if file_name == "":
+            self.statusBar().showMessage("Save cancelled", 2000)
+            return
+        path = Path(file_name)
+        path.write_text(editor.text())
+        self.tab_view.setTabText(self.tab_view.currentIndex(), path.name)
+        self.statusBar().showMessage(f"Saved {path.name}", 2000)
+        self.current_file = path
 
     def copy(self):
-        ...
+        # This will copy the contents of the current tab
+        editor = self.tab_view.currentWidget()
+        if editor is not None:
+            return
+
+        editor.copy()
 
 if __name__ == "__main__":
     app = QApplication([])
