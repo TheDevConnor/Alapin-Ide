@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(QMainWindow, self).__init__()
         self.side_bar_color = "#d8dee9"
-        self.window_color = "#000000"
+        self.window_color = "#2e3440"
         self.text_color = "#fff"
         self.init_ui()
 
@@ -28,8 +28,9 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet(open("src/css/style.qss", "r").read())
 
-        self.window_font = QFont("JetBrains Mono")
+        self.window_font = QFont("JetBrains Mono", 12, QFont.Normal, False)
         self.window_font.setPointSize(12)
+        self.window_font.setWeight(50)
         self.setFont(self.window_font)
 
         self.set_up_menu()
@@ -101,6 +102,10 @@ class MainWindow(QMainWindow):
         select_all_action.setShortcut("Ctrl+A")
         select_all_action.triggered.connect(self.select_all)
 
+        delete_action = edit_menu.addAction("Delete")
+        delete_action.setShortcut("Del")
+        delete_action.triggered.connect(self.delete)
+
         # View Menu
         view_menu = menu_bar.addMenu("View")
 
@@ -140,12 +145,11 @@ class MainWindow(QMainWindow):
         editor.setAutoCompletionCaseSensitivity(False)
         editor.setAutoCompletionUseSingle(QsciScintilla.AcusNever)
 
-        # Caret5
-        editor.setCaretForegroundColor(QColor("#2e3440"))
+        # Caret
+        # editor.setCaretForegroundColor(QColor("#2e3440"))
         editor.setCaretLineVisible(True)
-        editor.setCaretLineBackgroundColor(QColor("#d8dee1"))
         editor.setCaretWidth(4)
-        editor.setCaretLineBackgroundColor(QColor("#d8dee1"))
+        # editor.setCaretLineBackgroundColor(QColor("#d8dee1"))
 
         # EDL
         editor.setEolMode(QsciScintilla.EolUnix)
@@ -215,6 +219,7 @@ class MainWindow(QMainWindow):
         self.api = QsciAPIs(self.propertiesLexer)
         self.api = QsciAPIs(self.psLexer)
         self.api = QsciAPIs(self.coffiescriptLexer)
+
         for key in keyword.kwlist + dir(__builtins__):
             self.api.add(key)
 
@@ -248,14 +253,17 @@ class MainWindow(QMainWindow):
         # Line Number
         editor.setMarginLineNumbers(0, True)
         editor.setMarginWidth(0, "0000")
+        editor.setMarginsForegroundColor(QColor("#ff8888"))
+        editor.setMarginsBackgroundColor(QColor("#464a4d"))
+        editor.setMarginsFont(self.window_font)
 
         # Current Line
         editor.setCaretLineVisible(True)
-        editor.setCaretLineBackgroundColor(QColor("#d8dee9"))
+        editor.setCaretLineBackgroundColor(QColor("#282c34"))
 
         # Selection
         editor.setSelectionBackgroundColor(QColor("#4d12a2"))
-        editor.setSelectionForegroundColor(QColor("#d8dee9"))
+        editor.setSelectionForegroundColor(QColor("#6c7a87"))
 
         # White Space
         editor.setWhitespaceVisibility(QsciScintilla.WsVisible)
@@ -317,11 +325,11 @@ class MainWindow(QMainWindow):
         frame.setContentsMargins(0, 0, 0, 0)
         frame.setStyleSheet('''
             QFrame {
-                background-color: #d8dee1;
+                background-color: #6c7a87;
                 border-radius: 1px;
                 border: none;
                 padding: 5px;
-                color: #2e3440;
+                color: #d8dee9;
             }
             QFrame:hover {
                 color: blue;
@@ -344,8 +352,8 @@ class MainWindow(QMainWindow):
         body.setSpacing(0)
         body_frame.setLayout(body)
 
-        ##############################
-        ###### SIDE BAR ##########
+        ################################################
+        ###### SIDE BAR ##############################
         self.side_bar = QFrame()
         self.side_bar.setFrameShape(QFrame.StyledPanel)
         self.side_bar.setFrameShadow(QFrame.Plain)
@@ -378,8 +386,8 @@ class MainWindow(QMainWindow):
         # split view
         self.hsplit = QSplitter(Qt.Horizontal)
 
-        ##############################
-        ###### FILE MANAGER ##########
+        ################################################
+        ###### FILE MANAGER ########################
 
         # frame and layout to hold tree view (file manager)
         self.file_manager_frame = self.get_frame()
@@ -395,8 +403,8 @@ class MainWindow(QMainWindow):
         # File system filters
         self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs | QDir.Files)
 
-        ##############################
-        ###### FILE VIEWER ##########
+        ###############################################
+        ###### FILE VIEWER #############################
         self.tree_view = QTreeView()
         self.tree_view.setFont(QFont("FiraCode", 13))
         self.tree_view.setModel(self.model)
@@ -421,8 +429,8 @@ class MainWindow(QMainWindow):
         tree_frame_layout.addWidget(self.tree_view)
         self.file_manager_frame.setLayout(tree_frame_layout)
 
-        ##############################
-        ###### TAB WIDGETS ##########
+        ################################################
+        ###### TAB WIDGETS ##########################
 
         self.tab_view = QTabWidget()
         self.tab_view.setContentsMargins(5, 10, 5, 0)
@@ -432,8 +440,8 @@ class MainWindow(QMainWindow):
         self.tab_view.tabCloseRequested.connect(self.close_tab)
         self.tab_view.tabBar().setExpanding(False)
 
-        ###############################
-        ###### SETUP WIDGETS ##########
+        ##################################################
+        ###### SETUP WIDGETS ##########################
 
         # add tree view and tab view
         self.hsplit.addWidget(self.file_manager_frame)
@@ -461,7 +469,6 @@ class MainWindow(QMainWindow):
         # This is the about Menu
         QMessageBox.about(self, "About", "This is a simple text editor made by TheDevConnor on yt")
 
-
     def new_file(self):
         self.set_new_tab(None, is_new_file=True)
 
@@ -487,77 +494,70 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Opened folder {folder_name}")
 
     def save_file(self):
+        # TODO :: need to fix file save
         # Save the file
         if self.current_file is None and self.tab_view.count() > 0:
             self.save_as()
 
         editor = self.tab_view.currentWidget()
         self.current_file.write_text(editor.text())
-        self.statusBar().showMessage(f"Saved {self.current_file.name}", 2000)
+        self.statusBar().showMessage(f"Saved file {self.current_file}", 2000)
 
     def save_as(self):
-        # Save as
+        # Save as file
         editor = self.tab_view.currentWidget()
-        if editor is not None:
+        if editor is None:
             return
 
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "All Files (*)")
-        if file_name == "":
-            self.statusBar().showMessage("Save cancelled", 2000)
+        file_path = QFileDialog.getSaveFileName(self, "Save File", os.getcwd())[0]
+        if file_path == '':
+            self.statusBar().showMessage(f"Save file cancelled", 2000)
             return
-        path = Path(file_name)
+
+        path = Path(file_path)
         path.write_text(editor.text())
         self.tab_view.setTabText(self.tab_view.currentIndex(), path.name)
-        self.statusBar().showMessage(f"Saved {path.name}", 2000)
+        self.statusBar().showMessage(f"Saved file {file_path}", 2000)
         self.current_file = path
 
     def copy(self):
         # This will copy the contents of the current tab
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            return
-
-        editor.copy()
+            editor.copy()
 
     def cut(self):
         # This will cut the contents of the current tab
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            return
-
-        editor.cut()
+            editor.cut()
 
     def paste(self):
         # This will paste the contents of the current tab
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            return
-
-        editor.paste()
+            editor.paste()
 
     def undo(self):
         # This will undo the contents of the current tab
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            return
-
-        editor.undo()
+            editor.undo()
 
     def redo(self):
         # This will redo the contents of the current tab
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            return
-
-        editor.redo()
+            editor.redo()
 
     def select_all(self):
         # This will select all the contents of the current tab
         editor = self.tab_view.currentWidget()
         if editor is not None:
-            return
+            editor.selectAll()
 
-        editor.selectAll()
+    def delete(self):
+        ...
 
     def run(self):
         ...
