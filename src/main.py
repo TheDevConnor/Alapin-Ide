@@ -254,34 +254,37 @@ class MainWindow(QMainWindow):
         editor.setMarginLineNumbers(0, True)
         editor.setMarginWidth(0, "0000")
         editor.setMarginsForegroundColor(QColor("#ff8888"))
-        editor.setMarginsBackgroundColor(QColor("#464a4d"))
+        editor.setMarginsBackgroundColor(QColor("#3e3f40"))
         editor.setMarginsFont(self.window_font)
 
-        # Current Line
+        # Folding
+        editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
+        editor.setFoldMarginColors(QColor("#3e3f40"), QColor("#3e3f40"))
+
+        # Highlight current line
         editor.setCaretLineVisible(True)
-        editor.setCaretLineBackgroundColor(QColor("#282c34"))
+        editor.setCaretLineBackgroundColor(QColor("#464a4c"))
 
-        # Selection
-        editor.setSelectionBackgroundColor(QColor("#4d12a2"))
-        editor.setSelectionForegroundColor(QColor("#6c7a87"))
+        # Set the font
+        editor.setFont(self.window_font)
 
-        # White Space
-        editor.setWhitespaceVisibility(QsciScintilla.WsVisible)
-        editor.setWhitespaceForegroundColor(QColor("#4c566a"))
+        # Set the tab width
+        editor.setTabWidth(4)
 
-        # Indentation Guide
-        editor.setIndentationGuides(True)
-        editor.setIndentationGuidesForegroundColor(QColor("#4F56Ba"))
+        # Set the tab indentation
+        editor.setIndentationsUseTabs(False)
 
-        # Wrap Mode
-        editor.setWrapMode(QsciScintilla.WrapWord)
+        # Key Press
+        editor.keyPressEvent = self.handle_editor_press
 
-        # Zoom
-        editor.zoomTo(0)
-
-        # Set the default text
-        editor.setText("")
         return editor
+
+    def handle_editor_press(self, e: QKeyEvent):
+        editor: QsciScintilla = self.tab_view.currentWidget()
+        if e.modifiers() == Qt.ControlModifier and e.key() == Qt.Key_Space:
+            editor.autoCompleteFromAll()
+        else:
+            QsciScintilla.keyPressEvent(editor, e)
 
     def is_binary(self, path: Path):
         '''Check if the file is binary or not'''
