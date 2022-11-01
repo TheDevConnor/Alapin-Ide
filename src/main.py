@@ -121,8 +121,172 @@ class MainWindow(QMainWindow):
         self.tab_view.removeTab(index)
 
     def get_Editor(self) -> QsciScintilla:
-        editor = Editor()
+        # Initialize the editor
+        editor = QsciScintilla()
+        # Encoding the editor
+        editor.setUtf8(True)
+        # Set the font
+        editor.setFont(self.window_font)
+
+        # Brace matching
+        editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+
+        # Indentation
+        editor.setIndentationGuides(True)
+        editor.setTabWidth(4)
+        editor.setIndentationsUseTabs(False)
+        editor.setAutoIndent(True)
+
+        # Autocomplete
+        editor.setAutoCompletionSource(QsciScintilla.AcsAll)
+        editor.setAutoCompletionThreshold(1)
+        editor.setAutoCompletionCaseSensitivity(False)
+        editor.setAutoCompletionUseSingle(QsciScintilla.AcusNever)
+
+        # Caret
+        # editor.setCaretForegroundColor(QColor("#2e3440"))
+        editor.setCaretLineVisible(True)
+        editor.setCaretWidth(4)
+        # editor.setCaretLineBackgroundColor(QColor("#d8dee1"))
+
+        # EDL
+        editor.setEolMode(QsciScintilla.EolUnix)
+        editor.setEolVisibility(False)
+        
+        # Lexer for syntax highlighting
+        self.pyLexer = QsciLexerPython()
+        self.htmlLexer = QsciLexerHTML()
+        self.csharpLexer = QsciLexerCSharp()
+        self.cppLexer = QsciLexerCPP()
+        self.javaLexer = QsciLexerJava()
+        self.jsLexer = QsciLexerJavaScript()
+        self.luaLexer = QsciLexerLua()
+        self.rubyLexer = QsciLexerRuby()
+        self.xmlLexer = QsciLexerXML()
+        self.yamlLexer = QsciLexerYAML()
+        self.cmakeLexer = QsciLexerCMake()
+        self.cssLexer = QsciLexerCSS()
+        self.diffLexer = QsciLexerDiff()
+        self.makefileLexer = QsciLexerMakefile()
+        self.perlLexer = QsciLexerPerl()
+        self.powershellLexer = QsciLexerPOV()
+        self.povLexer = QsciLexerPOV()
+        self.propertiesLexer = QsciLexerProperties()
+        self.psLexer = QsciLexerPostScript()
+        self.coffiescriptLexer = QsciLexerCoffeeScript()
+
+        self.pyLexer.setDefaultFont(self.window_font)
+        self.htmlLexer.setDefaultFont(self.window_font)
+        self.csharpLexer.setDefaultFont(self.window_font)
+        self.cppLexer.setDefaultFont(self.window_font)
+        self.javaLexer.setDefaultFont(self.window_font)
+        self.jsLexer.setDefaultFont(self.window_font)
+        self.luaLexer.setDefaultFont(self.window_font)
+        self.rubyLexer.setDefaultFont(self.window_font)
+        self.xmlLexer.setDefaultFont(self.window_font)
+        self.yamlLexer.setDefaultFont(self.window_font)
+        self.cmakeLexer.setDefaultFont(self.window_font)
+        self.cssLexer.setDefaultFont(self.window_font)
+        self.diffLexer.setDefaultFont(self.window_font)
+        self.makefileLexer.setDefaultFont(self.window_font)
+        self.perlLexer.setDefaultFont(self.window_font)
+        self.powershellLexer.setDefaultFont(self.window_font)
+        self.povLexer.setDefaultFont(self.window_font)
+        self.propertiesLexer.setDefaultFont(self.window_font)
+        self.psLexer.setDefaultFont(self.window_font)
+        self.coffiescriptLexer.setDefaultFont(self.window_font)
+
+        # API
+        self.api = QsciAPIs(self.pyLexer)
+        self.api = QsciAPIs(self.htmlLexer)
+        self.api = QsciAPIs(self.csharpLexer)
+        self.api = QsciAPIs(self.cppLexer)
+        self.api = QsciAPIs(self.javaLexer)
+        self.api = QsciAPIs(self.jsLexer)
+        self.api = QsciAPIs(self.luaLexer)
+        self.api = QsciAPIs(self.rubyLexer)
+        self.api = QsciAPIs(self.xmlLexer)  
+        self.api = QsciAPIs(self.yamlLexer)
+        self.api = QsciAPIs(self.cmakeLexer)
+        self.api = QsciAPIs(self.cssLexer)
+        self.api = QsciAPIs(self.diffLexer)
+        self.api = QsciAPIs(self.makefileLexer)
+        self.api = QsciAPIs(self.perlLexer)
+        self.api = QsciAPIs(self.powershellLexer)
+        self.api = QsciAPIs(self.povLexer)
+        self.api = QsciAPIs(self.propertiesLexer)
+        self.api = QsciAPIs(self.psLexer)
+        self.api = QsciAPIs(self.coffiescriptLexer)
+
+        for key in keyword.kwlist + dir(__builtins__):
+            self.api.add(key)
+
+        for _, name, _ in pkgutil.iter_modules():
+            self.api.add(name)
+
+        self.api.prepare()
+
+        # Set the lexer
+        editor.setLexer(self.pyLexer)
+        editor.setLexer(self.htmlLexer)
+        editor.setLexer(self.csharpLexer)
+        editor.setLexer(self.cppLexer)
+        editor.setLexer(self.javaLexer)
+        editor.setLexer(self.jsLexer)
+        editor.setLexer(self.luaLexer)
+        editor.setLexer(self.rubyLexer)
+        editor.setLexer(self.xmlLexer)
+        editor.setLexer(self.yamlLexer)
+        editor.setLexer(self.cmakeLexer)
+        editor.setLexer(self.cssLexer)
+        editor.setLexer(self.diffLexer)
+        editor.setLexer(self.makefileLexer)
+        editor.setLexer(self.perlLexer)
+        editor.setLexer(self.powershellLexer)
+        editor.setLexer(self.povLexer)
+        editor.setLexer(self.propertiesLexer)
+        editor.setLexer(self.psLexer)
+        editor.setLexer(self.coffiescriptLexer)
+
+        # Line Number
+        editor.setMarginLineNumbers(0, True)
+        editor.setMarginWidth(0, "0000")
+        editor.setMarginsForegroundColor(QColor("#ff8888"))
+        editor.setMarginsBackgroundColor(QColor("#464a4d"))
+        editor.setMarginsFont(self.window_font)
+
+        # Current Line
+        editor.setCaretLineVisible(True)
+        editor.setCaretLineBackgroundColor(QColor("#282c34"))
+
+        # Selection
+        editor.setSelectionBackgroundColor(QColor("#4d12a2"))
+        editor.setSelectionForegroundColor(QColor("#6c7a87"))
+
+        # White Space
+        editor.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        editor.setWhitespaceForegroundColor(QColor("#4c566a"))
+
+        # Indentation Guide
+        editor.setIndentationGuides(True)
+        editor.setIndentationGuidesForegroundColor(QColor("#4F56Ba"))
+
+        # Wrap Mode
+        editor.setWrapMode(QsciScintilla.WrapWord)
+
+        # Zoom
+        editor.zoomTo(0)
+
+        # Set the default text
+        editor.setText("")
         return editor
+
+    def handle_editor_press(self, e: QKeyEvent):
+        editor: QsciScintilla = self.tab_view.currentWidget()
+        if e.modifiers() == Qt.ControlModifier and e.key() == Qt.Key_Space:
+            editor.autoCompleteFromAll()
+        else:
+            QsciScintilla.keyPressEvent(editor, e)
 
     def is_binary(self, path: Path):
         '''Check if the file is binary or not'''
