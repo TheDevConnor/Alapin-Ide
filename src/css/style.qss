@@ -1,14 +1,14 @@
-/* QMainWindow {
+QMainWindow {
     background-color: #68716f;
     color: #d3d3d3;
 }
+
 
 
 QTabWidget {
     background-color: #282c34;
     color: #d3d3d3;
 }
-
 
 QTabBar::tab {
     background-color: rgb(36, 36, 36);
@@ -26,12 +26,6 @@ QTabBar::tab::selected {
     background-color: #2d2d2d;
     border-bottom: 2px solid #d3d3d3;
 }
-
-
-QTabBar::close-button {
-    image: url(":/icons/close-icon.svg");
-}
-
 
 QSplitter {
     background-color: #282c34;
@@ -194,4 +188,4 @@ QMenuBar {
 QMenuBar::item {
     background-color: #5c6462;
     color: #d3d3d3;
-} */
+}
